@@ -27,6 +27,9 @@ docker compose up -d
 
 The database is exposed on host port **5433** (not 5432) so it does not fight with a local PostgreSQL install on Windows. `DATABASE_URL` in `backend/.env` must use that port.
 
+If migrations report **password authentication failed** even after fixing the port, wipe the Docker volume once so Postgres picks up the compose file (including local `trust` auth):  
+`docker compose down -v` then `docker compose up -d`, then `npm run db:migrate` from `backend/`.
+
 ### Backend
 
 ```bash
