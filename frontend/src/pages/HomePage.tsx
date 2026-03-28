@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { useAuth } from '../auth/AuthContext'
 
 const features = [
   {
@@ -31,6 +32,8 @@ const features = [
 ]
 
 export function HomePage() {
+  const { user } = useAuth()
+
   return (
     <>
       <main className="relative flex-1 overflow-hidden">
@@ -64,9 +67,14 @@ export function HomePage() {
                 >
                   Explore live map
                 </Link>
-                <Link to="/register" className="inline-flex items-center justify-center rounded-xl border-2 border-white/40 bg-white/10 px-5 py-3 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/20">
-                  Join FoodBridge
-                </Link>
+                {!user && (
+                  <Link
+                    to="/register"
+                    className="inline-flex items-center justify-center rounded-xl border-2 border-white/40 bg-white/10 px-5 py-3 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/20"
+                  >
+                    Join FoodBridge
+                  </Link>
+                )}
               </div>
             </div>
           </div>

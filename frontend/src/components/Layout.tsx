@@ -34,26 +34,23 @@ export function Layout() {
             </div>
           </Link>
           <nav className="flex flex-wrap items-center gap-1.5">
-            <NavLink to="/map" className={linkClass}>
-              Live map
-            </NavLink>
+            {user && (
+              <NavLink to="/map" className={linkClass}>
+                Live map
+              </NavLink>
+            )}
             {(user?.role === 'provider' || user?.role === 'admin') && (
               <NavLink to="/donate" className={linkClass}>
                 Donate
               </NavLink>
             )}
             {!user && (
-              <>
-                <NavLink to="/login" className={linkClass}>
-                  Log in
-                </NavLink>
-                <NavLink
-                  to="/register"
-                  className="rounded-full bg-linear-to-r from-accent-500 to-amber-500 px-5 py-2 text-sm font-bold text-stone-900 shadow-md shadow-amber-500/25 transition-transform hover:scale-[1.02] active:scale-[0.98]"
-                >
-                  Sign up
-                </NavLink>
-              </>
+              <NavLink
+                to="/login"
+                className="rounded-full bg-linear-to-r from-accent-500 to-amber-500 px-5 py-2 text-sm font-bold text-stone-900 shadow-md shadow-amber-500/25 transition-transform hover:scale-[1.02] active:scale-[0.98]"
+              >
+                Sign in
+              </NavLink>
             )}
             {user && (
               <>

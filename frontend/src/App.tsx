@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AuthProvider } from './auth/AuthContext'
 import { Layout } from './components/Layout'
+import { RequireAuth } from './components/RequireAuth'
 import { DonatePage } from './pages/DonatePage'
 import { HomePage } from './pages/HomePage'
 import { LoginPage } from './pages/LoginPage'
@@ -14,7 +15,14 @@ export default function App() {
         <Routes>
           <Route element={<Layout />}>
             <Route path="/" element={<HomePage />} />
-            <Route path="/map" element={<MapPage />} />
+            <Route
+              path="/map"
+              element={
+                <RequireAuth>
+                  <MapPage />
+                </RequireAuth>
+              }
+            />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/donate" element={<DonatePage />} />

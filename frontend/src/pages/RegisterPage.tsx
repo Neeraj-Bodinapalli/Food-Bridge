@@ -1,10 +1,13 @@
 import { useState, type FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
 
 export function RegisterPage() {
   const { register } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
+  const from =
+    (location.state as { from?: { pathname?: string } } | null)?.from?.pathname ?? '/map'
   const [role, setRole] = useState<'provider' | 'recipient' | 'volunteer'>('recipient')
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
@@ -25,7 +28,7 @@ export function RegisterPage() {
         lat: 13.0827,
         lng: 80.2707,
       })
-      navigate('/map', { replace: true })
+      navigate(from, { replace: true })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed')
     } finally {
@@ -108,7 +111,11 @@ export function RegisterPage() {
           </form>
           <p className="mt-8 text-center text-sm text-stone-500">
             Already registered?{' '}
-            <Link to="/login" className="font-bold text-brand-700 hover:text-brand-800 hover:underline">
+            <Link
+              to="/login"
+              state={location.state}
+              className="font-bold text-brand-700 hover:text-brand-800 hover:underline"
+            >
               Log in
             </Link>
           </p>

@@ -1,10 +1,13 @@
 import { useState, type FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
 
 export function LoginPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
+  const from =
+    (location.state as { from?: { pathname?: string } } | null)?.from?.pathname ?? '/map'
   const [phone, setPhone] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -16,7 +19,7 @@ export function LoginPage() {
     setBusy(true)
     try {
       await login(phone, password)
-      navigate('/map', { replace: true })
+      navigate(from, { replace: true })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed')
     } finally {
@@ -72,9 +75,13 @@ export function LoginPage() {
             </button>
           </form>
           <p className="mt-8 text-center text-sm text-stone-500">
-            No account?{' '}
-            <Link to="/register" className="font-bold text-brand-700 hover:text-brand-800 hover:underline">
-              Create one
+            New user?{' '}
+            <Link
+              to="/register"
+              state={location.state}
+              className="font-bold text-brand-700 hover:text-brand-800 hover:underline"
+            >
+              Sign up
             </Link>
           </p>
         </div>
