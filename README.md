@@ -25,6 +25,8 @@ From the repo root:
 docker compose up -d
 ```
 
+The database is exposed on host port **5433** (not 5432) so it does not fight with a local PostgreSQL install on Windows. `DATABASE_URL` in `backend/.env` must use that port.
+
 ### Backend
 
 ```bash
