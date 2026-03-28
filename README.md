@@ -2,22 +2,20 @@
 
 Real-time surplus food redistribution platform (web). Product direction follows `FoodBridge_PRD_Final.docx` in this repo.
 
+## MVP choices (per build)
+
+- **Media**: Optional image URLs or placeholders only — **no Cloudinary** integration.
+- **Notifications**: **WebSocket** fan-out to connected browsers — **no Firebase / FCM**.
+- **Realtime bus**: **In-memory** on the API process — **no Redis** (fine for hackathon demos; scale-out would need Redis or similar).
+- **Demo geography**: **Chennai** centre with `npm run db:seed` (10 listings + two demo accounts).
+- **Deployment target**: **Vercel** (frontend), **Railway** (API), **Supabase** (managed PostgreSQL + PostGIS). Develop locally until you wire those hosts.
+
 ## Structure
 
-- **`frontend`** — React + Vite + TypeScript + Tailwind CSS
-- **`backend`** — Node.js + Express API (REST + WebSockets in later steps)
+- **`frontend`** — React + Vite + TypeScript + Tailwind + Leaflet map
+- **`backend`** — Node.js + Express (REST + WebSocket on `/ws`)
 
 ## Quick start
-
-### Frontend
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Open http://localhost:5173
 
 ### Database (PostGIS)
 
@@ -34,20 +32,42 @@ cd backend
 npm install
 cp .env.example .env
 npm run db:migrate
+npm run db:seed
 npm run dev
 ```
 
-Health check: http://localhost:4000/health
+Health: http://localhost:4000/health · WebSocket: `ws://localhost:4000/ws`
 
-Auth: `POST /api/auth/register`, `POST /api/auth/login`, `GET /api/auth/me` (Bearer token).
+### Frontend
 
-## Roadmap (from PRD)
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-- PostgreSQL + PostGIS listings and radius search
-- JWT auth, listings CRUD, claims + QR handoff
-- Redis pub-sub + WebSocket fan-out
-- Leaflet map, impact dashboard, seed data
+Open http://localhost:5173 — the dev server **proxies** `/api` and `/ws` to port **4000**.
+
+### Demo logins (after seed)
+
+| Role      | Phone           | Password          |
+| --------- | --------------- | ----------------- |
+| Provider  | `+919876543210` | `DemoProvider123` |
+| Recipient | `+919876543211` | `DemoRecipient123` |
+
+## API sketch
+
+- `POST /api/auth/register` · `POST /api/auth/login` · `GET /api/auth/me`
+- `GET /api/listings/nearby?lat=&lng=&radius_km=` · `GET /api/listings/:id`
+- `POST /api/listings` (provider/admin JWT)
+- `PATCH /api/listings/:id/claim` (recipient/volunteer/admin JWT) → returns `qr_token`
+- `POST /api/listings/:id/confirm` body `{ "qr_token" }` (listing owner or admin)
+- `GET /api/dashboard/impact`
+
+## Split hosts (later)
+
+Set **`VITE_API_URL`** to your Railway API origin (no trailing slash) so the browser can call the API from Vercel. Set **`VITE_WS_URL`** to the full WebSocket URL (for example `wss://your-api.host/ws`).
 
 ## Environment
 
-Set `CORS_ORIGIN` to your Vite origin in production. Connect `DATABASE_URL` when the database layer is added.
+Use **`CORS_ORIGIN`** for allowed browser origins (comma-separated). **`JWT_SECRET`** must be strong in production.
