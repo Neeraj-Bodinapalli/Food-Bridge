@@ -27,8 +27,11 @@ docker compose up -d
 
 The database is exposed on host port **5433** (not 5432) so it does not fight with a local PostgreSQL install on Windows. `DATABASE_URL` in `backend/.env` must use that port.
 
-If migrations report **password authentication failed** even after fixing the port, wipe the Docker volume once so Postgres picks up the compose file (including local `trust` auth):  
-`docker compose down -v` then `docker compose up -d`, then `npm run db:migrate` from `backend/`.
+If migrations report **password authentication failed**, the DB files were almost certainly created **before** `POSTGRES_HOST_AUTH_METHOD=trust` was added; that setting only runs on **first** database init. The compose file uses a **new volume name** (`foodbridge_pgdata_v2`) so `docker compose up -d` creates a fresh cluster. Run from repo root:
+
+`docker compose down` then `docker compose up -d`, wait ~20s, then `cd backend` and `npm run db:migrate` / `npm run db:seed`.
+
+Local `DATABASE_URL` has **no password** in the URL (trust auth). Remove the old unused volume if you like: `docker volume rm foodbridge_foodbridge_pgdata`.
 
 ### Backend
 

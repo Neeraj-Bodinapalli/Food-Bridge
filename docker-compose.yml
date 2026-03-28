@@ -6,13 +6,13 @@ services:
       POSTGRES_USER: foodbridge
       POSTGRES_PASSWORD: foodbridge
       POSTGRES_DB: foodbridge
-      # Local dev only: avoids password/auth edge cases on Windows + existing volumes.
+      # Applies only on first init of the data dir. New volume name below forces a clean init.
       POSTGRES_HOST_AUTH_METHOD: trust
-    # Host 5433 avoids clashing with a local PostgreSQL install on Windows (often uses 5432).
     ports:
       - "5433:5432"
     volumes:
-      - foodbridge_pgdata:/var/lib/postgresql/data
+      # Bumped name so `docker compose up` gets a fresh cluster (trust auth, correct roles).
+      - foodbridge_pgdata_v2:/var/lib/postgresql/data
 
 volumes:
-  foodbridge_pgdata:
+  foodbridge_pgdata_v2:
