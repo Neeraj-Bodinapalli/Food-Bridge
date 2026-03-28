@@ -1,14 +1,12 @@
+import './env.js'
 import http from 'node:http'
 import cors from 'cors'
-import dotenv from 'dotenv'
 import express from 'express'
 import { authRouter } from './routes/auth.js'
 import { dashboardRouter } from './routes/dashboard.js'
 import { listingsRouter } from './routes/listings.js'
 import { expireActiveListings } from './expire.js'
 import { attachWebSocket } from './realtime.js'
-
-dotenv.config()
 
 const app = express()
 const port = Number(process.env.PORT) || 4000

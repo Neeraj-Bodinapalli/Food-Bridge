@@ -1,8 +1,6 @@
-import dotenv from 'dotenv'
+import '../src/env.js'
 import { hashPassword, hashPhone } from '../src/auth.js'
 import { query } from '../src/db.js'
-
-dotenv.config()
 
 const DEMO_PROVIDER = {
   phone: '+919876543210',
