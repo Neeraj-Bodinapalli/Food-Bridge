@@ -45,7 +45,7 @@ export function FoodMap({ center, listings, onSelect, reportMoves, onMapCenter }
     <MapContainer
       center={center}
       zoom={13}
-      className="z-0 h-[min(480px,50vh)] w-full rounded-xl border border-neutral-200 shadow-sm sm:h-[min(560px,55vh)]"
+      className="z-0 h-[min(420px,48vh)] w-full overflow-hidden rounded-2xl border border-stone-200/90 shadow-[0_8px_40px_-12px_rgba(0,0,0,0.15),0_0_0_1px_rgba(6,78,59,0.04)] ring-1 ring-black/[0.03] sm:h-[min(520px,56vh)]"
       scrollWheelZoom
     >
       <TileLayer

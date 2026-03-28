@@ -33,11 +33,13 @@ export function DonatePage() {
   }
   if (user.role !== 'provider' && user.role !== 'admin') {
     return (
-      <main className="mx-auto max-w-lg flex-1 px-4 py-12">
-        <p className="text-neutral-700">Only providers can post food. Switch account or register as a provider.</p>
-        <Link to="/register" className="mt-4 inline-block text-sm font-medium text-brand-700 hover:underline">
-          Register
-        </Link>
+      <main className="mx-auto max-w-lg flex-1 px-4 py-16 text-center">
+        <div className="fb-card">
+          <p className="text-stone-700">Only providers can post food.</p>
+          <Link to="/register" className="mt-4 inline-block text-sm font-bold text-brand-700 hover:underline">
+            Register as provider
+          </Link>
+        </div>
       </main>
     )
   }
@@ -80,146 +82,143 @@ export function DonatePage() {
   }
 
   return (
-    <main className="mx-auto max-w-2xl flex-1 px-4 py-10">
-      <h1 className="text-2xl font-semibold text-neutral-900">Donate food</h1>
-      <p className="mt-2 text-sm text-neutral-600">
-        Photos: paste an image URL or leave blank — MVP uses placeholders only (no Cloudinary).
-      </p>
-      <form onSubmit={onSubmit} className="mt-8 grid gap-4 sm:grid-cols-2">
-        {message && (
-          <div className="sm:col-span-2 rounded-lg border border-brand-200 bg-brand-50 px-3 py-2 text-sm text-brand-900">
-            {message}
+    <main className="mx-auto max-w-3xl flex-1 px-4 py-10 sm:px-6">
+      <div className="mb-8">
+        <p className="text-xs font-bold uppercase tracking-widest text-brand-600">Provider</p>
+        <h1 className="mt-1 font-serif text-3xl font-semibold text-stone-900 sm:text-4xl">Donate food</h1>
+        <p className="mt-2 max-w-xl text-sm text-stone-500">
+          Add a photo URL or skip it—listings go live on the map with WebSocket updates.
+        </p>
+      </div>
+      <div className="fb-card">
+        <form onSubmit={onSubmit} className="grid gap-5 sm:grid-cols-2">
+          {message && (
+            <div
+              className={`sm:col-span-2 rounded-xl border px-4 py-3 text-sm font-medium ${
+                message.includes('published')
+                  ? 'border-brand-200 bg-brand-50 text-brand-900'
+                  : 'border-red-200 bg-red-50 text-red-800'
+              }`}
+            >
+              {message}
+            </div>
+          )}
+          <div>
+            <label className="fb-label">Food type</label>
+            <select
+              className="fb-input"
+              value={foodType}
+              onChange={(e) => setFoodType(e.target.value as (typeof FOOD_TYPES)[number])}
+            >
+              {FOOD_TYPES.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </select>
           </div>
-        )}
-        <div>
-          <label className="block text-sm font-medium text-neutral-700">Food type</label>
-          <select
-            className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm"
-            value={foodType}
-            onChange={(e) => setFoodType(e.target.value as (typeof FOOD_TYPES)[number])}
-          >
-            {FOOD_TYPES.map((t) => (
-              <option key={t} value={t}>
-                {t}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-neutral-700">Optional image URL</label>
-          <input
-            className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm"
-            value={photoUrl}
-            onChange={(e) => setPhotoUrl(e.target.value)}
-            placeholder="https://picsum.photos/seed/myfood/480/360"
-          />
-        </div>
-        <div className="sm:col-span-2">
-          <label className="block text-sm font-medium text-neutral-700">Description</label>
-          <textarea
-            className="mt-1 min-h-[88px] w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-neutral-700">Quantity (kg)</label>
-          <input
-            className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm"
-            type="number"
-            step="0.1"
-            min="0"
-            value={quantityKg}
-            onChange={(e) => setQuantityKg(e.target.value)}
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-neutral-700">Servings (est.)</label>
-          <input
-            className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm"
-            type="number"
-            min="1"
-            value={servings}
-            onChange={(e) => setServings(e.target.value)}
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-neutral-700">Pickup start</label>
-          <input
-            className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm"
-            type="datetime-local"
-            value={pickupStart}
-            onChange={(e) => setPickupStart(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-neutral-700">Pickup end</label>
-          <input
-            className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm"
-            type="datetime-local"
-            value={pickupEnd}
-            onChange={(e) => setPickupEnd(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-neutral-700">Listing expires</label>
-          <input
-            className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm"
-            type="datetime-local"
-            value={expiresAt}
-            onChange={(e) => setExpiresAt(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-neutral-700">Allergens (comma separated)</label>
-          <input
-            className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm"
-            value={allergens}
-            onChange={(e) => setAllergens(e.target.value)}
-            placeholder="dairy, gluten"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-neutral-700">Latitude</label>
-          <input
-            className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm"
-            value={lat}
-            onChange={(e) => setLat(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-neutral-700">Longitude</label>
-          <input
-            className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm"
-            value={lng}
-            onChange={(e) => setLng(e.target.value)}
-            required
-          />
-        </div>
-        <div className="sm:col-span-2">
-          <label className="block text-sm font-medium text-neutral-700">Safety note</label>
-          <textarea
-            className="mt-1 min-h-[72px] w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm"
-            value={safetyNote}
-            onChange={(e) => setSafetyNote(e.target.value)}
-            required
-          />
-        </div>
-        <div className="sm:col-span-2">
-          <button
-            type="submit"
-            disabled={busy}
-            className="rounded-xl bg-brand-600 px-5 py-3 text-sm font-semibold text-white hover:bg-brand-700 disabled:opacity-60"
-          >
-            {busy ? 'Publishing…' : 'Publish listing'}
-          </button>
-        </div>
-      </form>
+          <div>
+            <label className="fb-label">Image URL (optional)</label>
+            <input
+              className="fb-input"
+              value={photoUrl}
+              onChange={(e) => setPhotoUrl(e.target.value)}
+              placeholder="https://picsum.photos/seed/myfood/480/360"
+            />
+          </div>
+          <div className="sm:col-span-2">
+            <label className="fb-label">Description</label>
+            <textarea
+              className="fb-input min-h-[100px] resize-y"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label className="fb-label">Quantity (kg)</label>
+            <input
+              className="fb-input"
+              type="number"
+              step="0.1"
+              min="0"
+              value={quantityKg}
+              onChange={(e) => setQuantityKg(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="fb-label">Servings (est.)</label>
+            <input
+              className="fb-input"
+              type="number"
+              min="1"
+              value={servings}
+              onChange={(e) => setServings(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="fb-label">Pickup start</label>
+            <input
+              className="fb-input"
+              type="datetime-local"
+              value={pickupStart}
+              onChange={(e) => setPickupStart(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label className="fb-label">Pickup end</label>
+            <input
+              className="fb-input"
+              type="datetime-local"
+              value={pickupEnd}
+              onChange={(e) => setPickupEnd(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label className="fb-label">Listing expires</label>
+            <input
+              className="fb-input"
+              type="datetime-local"
+              value={expiresAt}
+              onChange={(e) => setExpiresAt(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label className="fb-label">Allergens (comma)</label>
+            <input
+              className="fb-input"
+              value={allergens}
+              onChange={(e) => setAllergens(e.target.value)}
+              placeholder="dairy, gluten"
+            />
+          </div>
+          <div>
+            <label className="fb-label">Latitude</label>
+            <input className="fb-input" value={lat} onChange={(e) => setLat(e.target.value)} required />
+          </div>
+          <div>
+            <label className="fb-label">Longitude</label>
+            <input className="fb-input" value={lng} onChange={(e) => setLng(e.target.value)} required />
+          </div>
+          <div className="sm:col-span-2">
+            <label className="fb-label">Safety note</label>
+            <textarea
+              className="fb-input min-h-[80px]"
+              value={safetyNote}
+              onChange={(e) => setSafetyNote(e.target.value)}
+              required
+            />
+          </div>
+          <div className="sm:col-span-2 pt-2">
+            <button type="submit" disabled={busy} className="fb-btn-primary px-8 py-3.5">
+              {busy ? 'Publishing…' : 'Publish listing'}
+            </button>
+          </div>
+        </form>
+      </div>
     </main>
   )
 }

@@ -5,27 +5,37 @@ export function Layout() {
   const { user, logout } = useAuth()
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
-    `rounded-lg px-3 py-2 text-sm font-medium ${isActive ? 'bg-brand-100 text-brand-900' : 'text-neutral-600 hover:bg-brand-50 hover:text-brand-900'}`
+    `rounded-full px-4 py-2 text-sm font-semibold transition-all ${
+      isActive
+        ? 'bg-brand-600 text-white shadow-md shadow-brand-600/25'
+        : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900'
+    }`
 
   return (
-    <div className="flex min-h-dvh flex-col bg-linear-to-b from-brand-50 to-white text-neutral-900">
-      <header className="border-b border-brand-100 bg-white/80 backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-4">
-          <Link to="/" className="flex items-center gap-2">
+    <div className="flex min-h-dvh flex-col bg-stone-50 text-stone-900">
+      <header className="sticky top-0 z-50 border-b border-stone-200/80 bg-white/75 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-3 sm:px-6">
+          <Link to="/" className="group flex items-center gap-3">
             <span
-              className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-600 text-sm font-bold text-white"
+              className="flex h-11 w-11 items-center justify-center rounded-2xl bg-linear-to-br from-brand-500 to-brand-700 text-lg font-bold text-white shadow-lg shadow-brand-600/30 transition-transform group-hover:scale-105"
               aria-hidden
             >
-              FB
+              <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 3c-4 4-7 7.5-7 11a7 7 0 1014 0c0-3.5-3-7-7-11z"
+                />
+              </svg>
             </span>
             <div className="text-left leading-tight">
-              <p className="text-base font-semibold tracking-tight">FoodBridge</p>
-              <p className="text-xs text-neutral-500">Chennai demo · local surplus</p>
+              <p className="font-serif text-lg font-semibold tracking-tight text-stone-900">FoodBridge</p>
+              <p className="text-[11px] font-medium uppercase tracking-widest text-brand-600">Share surplus · Feed locals</p>
             </div>
           </Link>
-          <nav className="flex flex-wrap items-center gap-1">
+          <nav className="flex flex-wrap items-center gap-1.5">
             <NavLink to="/map" className={linkClass}>
-              Map
+              Live map
             </NavLink>
             {(user?.role === 'provider' || user?.role === 'admin') && (
               <NavLink to="/donate" className={linkClass}>
@@ -39,7 +49,7 @@ export function Layout() {
                 </NavLink>
                 <NavLink
                   to="/register"
-                  className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-700"
+                  className="rounded-full bg-linear-to-r from-accent-500 to-amber-500 px-5 py-2 text-sm font-bold text-stone-900 shadow-md shadow-amber-500/25 transition-transform hover:scale-[1.02] active:scale-[0.98]"
                 >
                   Sign up
                 </NavLink>
@@ -47,13 +57,13 @@ export function Layout() {
             )}
             {user && (
               <>
-                <span className="hidden px-2 text-xs text-neutral-500 sm:inline">
-                  {user.name} · {user.role}
+                <span className="hidden max-w-[140px] truncate rounded-full bg-stone-100 px-3 py-1.5 text-xs font-medium text-stone-600 sm:inline">
+                  {user.name}
                 </span>
                 <button
                   type="button"
                   onClick={() => logout()}
-                  className="rounded-lg px-3 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-100"
+                  className="rounded-full px-4 py-2 text-sm font-semibold text-stone-500 transition-colors hover:bg-stone-100 hover:text-stone-800"
                 >
                   Log out
                 </button>
