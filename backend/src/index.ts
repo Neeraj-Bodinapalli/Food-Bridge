@@ -1,7 +1,12 @@
+import http from 'node:http'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import express from 'express'
 import { authRouter } from './routes/auth.js'
+import { dashboardRouter } from './routes/dashboard.js'
+import { listingsRouter } from './routes/listings.js'
+import { expireActiveListings } from './expire.js'
+import { attachWebSocket } from './realtime.js'
 
 dotenv.config()
 
@@ -16,6 +21,8 @@ app.get('/health', (_req, res) => {
 })
 
 app.use('/api/auth', authRouter)
+app.use('/api/listings', listingsRouter)
+app.use('/api/dashboard', dashboardRouter)
 
 app.use(
   (err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
@@ -28,6 +35,21 @@ app.use(
   },
 )
 
-app.listen(port, () => {
+const server = http.createServer(app)
+attachWebSocket(server)
+
+const EXPIRE_MS = 60_000
+setInterval(() => {
+  void (async () => {
+    try {
+      await expireActiveListings()
+    } catch {
+      /* DB offline or not configured */
+    }
+  })()
+}, EXPIRE_MS)
+
+server.listen(port, () => {
   console.log(`FoodBridge API listening on http://localhost:${port}`)
+  console.log(`WebSocket feed at ws://localhost:${port}/ws`)
 })

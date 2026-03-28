@@ -32,6 +32,17 @@ export const requireAuth: RequestHandler = (req, res, next) => {
   }
 }
 
+export function requireRole(...allowed: string[]): RequestHandler {
+  return (req, res, next) => {
+    const u = (req as Request & { user?: JwtUser }).user
+    if (!u || !allowed.includes(u.role)) {
+      res.status(403).json({ error: 'Forbidden' })
+      return
+    }
+    next()
+  }
+}
+
 export function hashPhone(phone: string): string {
   const normalized = phone.replace(/\s+/g, '')
   return createHash('sha256').update(normalized).digest('hex')
