@@ -19,16 +19,27 @@ npm run dev
 
 Open http://localhost:5173
 
+### Database (PostGIS)
+
+From the repo root:
+
+```bash
+docker compose up -d
+```
+
 ### Backend
 
 ```bash
 cd backend
 npm install
 cp .env.example .env
+npm run db:migrate
 npm run dev
 ```
 
 Health check: http://localhost:4000/health
+
+Auth: `POST /api/auth/register`, `POST /api/auth/login`, `GET /api/auth/me` (Bearer token).
 
 ## Roadmap (from PRD)
 
