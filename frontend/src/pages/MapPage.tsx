@@ -1,7 +1,7 @@
-import QRCode from 'react-qr-code'
+import { QRCodeSVG } from 'qrcode.react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { apiFetch } from '../api'
+import { apiFetch, getWebSocketUrl } from '../api'
 import { useAuth } from '../auth/AuthContext'
 import { FoodMap } from '../components/FoodMap'
 import type { Listing } from '../types'
@@ -89,17 +89,22 @@ export function MapPage() {
   }, [loadImpact])
 
   useEffect(() => {
-    const configured = import.meta.env.VITE_WS_URL as string | undefined
-    const wsUrl =
-      configured && configured.length > 0
-        ? configured
-        : `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/ws`
+    const wsUrl = getWebSocketUrl()
     const ws = new WebSocket(wsUrl)
     ws.onmessage = () => {
       void loadNearbyRef.current()
       void loadImpact()
     }
-    return () => ws.close()
+    ws.onerror = () => {
+      /* dev: ignore noisy proxy resets */
+    }
+    return () => {
+      try {
+        ws.close()
+      } catch {
+        /* ignore */
+      }
+    }
   }, [loadImpact])
 
   useEffect(() => {
@@ -133,24 +138,34 @@ export function MapPage() {
     if (!token || !selectedId) return
     setClaimBusy(true)
     setPanelError(null)
-    const r = await apiFetch(`/api/listings/${selectedId}/claim`, {
-      method: 'PATCH',
-      token,
-    })
-    const data = await r.json().catch(() => ({}))
-    if (!r.ok) {
-      setPanelError((data as { error?: string }).error ?? 'Claim failed')
+    try {
+      const r = await apiFetch(`/api/listings/${selectedId}/claim`, {
+        method: 'PATCH',
+        token,
+      })
+      const data = (await r.json().catch(() => ({}))) as { qr_token?: unknown; error?: string }
+      if (!r.ok) {
+        setPanelError(data.error ?? 'Claim failed')
+        return
+      }
+      const qr =
+        typeof data.qr_token === 'string' && data.qr_token.length > 0 ? data.qr_token : null
+      if (!qr) {
+        setPanelError('Invalid response from server (missing token).')
+        return
+      }
+      setHandoffToken(qr)
+      await loadNearby()
+      const refresh = await apiFetch(`/api/listings/${selectedId}`)
+      if (refresh.ok) {
+        const j = (await refresh.json()) as { listing: Listing }
+        setDetail(j.listing)
+      }
+    } catch {
+      setPanelError('Network error — is the API running on port 4000?')
+    } finally {
       setClaimBusy(false)
-      return
     }
-    setHandoffToken((data as { qr_token: string }).qr_token)
-    await loadNearby()
-    const refresh = await apiFetch(`/api/listings/${selectedId}`)
-    if (refresh.ok) {
-      const j = (await refresh.json()) as { listing: Listing }
-      setDetail(j.listing)
-    }
-    setClaimBusy(false)
   }
 
   async function confirmHandoff() {
@@ -346,11 +361,11 @@ export function MapPage() {
                       </p>
                     )}
 
-                    {handoffToken && (
+                    {handoffToken != null && handoffToken.length > 0 && (
                       <div className="rounded-2xl border border-brand-200 bg-linear-to-b from-brand-50 to-white p-4 text-center shadow-inner">
                         <p className="text-xs font-bold uppercase tracking-wide text-brand-800">Show to provider</p>
                         <div className="mt-4 flex justify-center rounded-xl bg-white p-3 shadow-sm ring-1 ring-stone-100">
-                          <QRCode value={handoffToken} size={168} />
+                          <QRCodeSVG value={handoffToken} size={168} fgColor="#065f46" bgColor="#ffffff" />
                         </div>
                         <p className="mt-3 break-all font-mono text-[10px] text-stone-400">{handoffToken}</p>
                       </div>
